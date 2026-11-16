@@ -59,18 +59,12 @@
       @media (max-width: 560px) { .wrap { padding: 0 18px; } }
       section[id], footer[id] { scroll-margin-top: 90px; }
 
-      /* Movimento profissional (GSAP + Lenis) — o conteúdo nasce visível:
-         nenhum estado inicial escondido vive no CSS. Quem posiciona os
-         estados iniciais é o JS, via gsap.set; sem JS, lê-se tudo. */
+      /* Movimento profissional (GSAP + Lenis) — o conteúdo nasce sempre
+         visível: as animações usam só transform (deslocamento e escala),
+         sem esconder nada com transparência ou recorte. Sem JS, lê-se tudo. */
       html.lenis, html.lenis body { height: auto; }
       .lenis.lenis-smooth { scroll-behavior: auto !important; }
       .lenis.lenis-stopped { overflow: hidden; }
-      /* Máscara por palavra do título do hero (estrutura criada pelo JS) */
-      .wm {
-        display: inline-block; overflow: hidden; vertical-align: bottom;
-        padding-bottom: 0.14em; margin-bottom: -0.14em;
-      }
-      .wi { display: inline-block; will-change: transform; }
       .hero-photo .ph { transform-origin: center; will-change: transform; }
       .hero-photo img { will-change: transform; }
       .svc .ph img { will-change: transform; }
@@ -384,9 +378,7 @@
     <div class="demo-bar" role="note">
       <div class="wrap">
         <span>Demonstração criada por <b>Jack / Francisco Cossa</b>,</span>
-        <span><a href="mailto:fcossa410@gmail.com">fcossa410@gmail.com</a>,</span>
-        <span><a href="tel:+258879713365">+258 879713365</a>,</span>
-        <span>hospedagem incluída</span>
+        <span><a href="mailto:fcossa410@gmail.com">fcossa410@gmail.com</a></span>
       </div>
     </div>
 
@@ -732,7 +724,7 @@
         </div>
         <div class="foot-bottom">
           <span>© Clínica 222 · Maputo</span>
-          <span>Demonstração criada por Jack / Francisco Cossa — hospedagem incluída.</span>
+          <span>Demonstração criada por Jack / Francisco Cossa — <a href="mailto:fcossa410@gmail.com">fcossa410@gmail.com</a></span>
         </div>
       </div>
     </footer>
@@ -898,64 +890,22 @@
           });
         }
 
-        /* ---------- Título do hero dividido por PALAVRAS ---------- */
-        function splitWords(el) {
-          var inners = [];
-          function process(node) {
-            var children = Array.prototype.slice.call(node.childNodes);
-            children.forEach(function (child) {
-              if (child.nodeType === 3) {
-                var parts = child.textContent.split(/(\s+)/);
-                var frag = document.createDocumentFragment();
-                parts.forEach(function (part) {
-                  if (!part) return;
-                  if (/^\s+$/.test(part)) {
-                    frag.appendChild(document.createTextNode(' '));
-                  } else {
-                    var mask = document.createElement('span');
-                    mask.className = 'wm';
-                    mask.setAttribute('aria-hidden', 'true');
-                    var inner = document.createElement('span');
-                    inner.className = 'wi';
-                    inner.textContent = part;
-                    mask.appendChild(inner);
-                    frag.appendChild(mask);
-                    inners.push(inner);
-                  }
-                });
-                node.replaceChild(frag, child);
-              } else if (child.nodeType === 1) {
-                process(child);
-              }
-            });
-          }
-          process(el);
-          return inners;
-        }
-
-        var title = document.getElementById('heroTitle');
-        var wordInners = [];
-        if (title) {
-          title.setAttribute('aria-label', title.textContent.replace(/\s+/g, ' ').trim());
-          wordInners = splitWords(title);
-        }
-
-        /* ---------- Entrada do hero: 250ms após o load ---------- */
+        /* ---------- Entrada do hero: 250ms após o load ----------
+           Só transform (deslocamento/escala): o título, o texto e a foto
+           nascem sempre visíveis — sem esconder nada. */
         var heroTl = gsap.timeline({ delay: 0.25, defaults: { ease: EASE } });
-        if (wordInners.length) {
-          gsap.set(wordInners, { yPercent: 115 });
-          heroTl.to(wordInners, { yPercent: 0, duration: 1.1, stagger: 0.08 }, 0);
+        var title = document.getElementById('heroTitle');
+        if (title) {
+          heroTl.from(title, { y: 44, duration: 1.1 }, 0);
         }
         var heroSide = gsap.utils.toArray('.hero-where, .hero-lead, .hero-ctas, .hero-meta');
         if (heroSide.length) {
-          gsap.set(heroSide, { y: 26, opacity: 0 });
-          heroTl.to(heroSide, { y: 0, opacity: 1, duration: 0.9, stagger: 0.09 }, 0.15);
+          heroTl.from(heroSide, { y: 26, duration: 0.9, stagger: 0.09 }, 0.15);
         }
         var heroPhoto = document.querySelector('.hero-photo');
         var heroImg = document.querySelector('.hero-photo img');
         if (heroPhoto) {
-          gsap.set(heroPhoto, { clipPath: 'inset(0 0 100% 0)' });
-          heroTl.to(heroPhoto, { clipPath: 'inset(0 0 0% 0)', duration: 1.2 }, 0.1);
+          heroTl.from(heroPhoto, { y: 48, duration: 1.2 }, 0.1);
         }
 
         /* Ken Burns lento na foto do hero: escala 1 → 1.1, linear, 14s */
@@ -973,68 +923,57 @@
           gsap.to('.hero-photo .ph', { scale: 1.05, ease: 'none', scrollTrigger: heroTrigger });
         }
 
-        /* ---------- Reveals das secções: só transform / opacity / clip-path ---------- */
+        /* ---------- Reveals das secções: só transform — o conteúdo nasce sempre visível ---------- */
         gsap.utils.toArray('.sec-head').forEach(function (head) {
           gsap.from(head, {
-            y: 36, opacity: 0, duration: 1, ease: EASE, clearProps: 'transform,opacity',
+            y: 36, duration: 1, ease: EASE, clearProps: 'transform',
             scrollTrigger: { trigger: head, start: 'top 86%' }
           });
         });
 
         gsap.from('.facts .fact', {
-          y: 26, opacity: 0, duration: 0.9, ease: EASE, stagger: 0.09, clearProps: 'transform,opacity',
+          y: 26, duration: 0.9, ease: EASE, stagger: 0.09, clearProps: 'transform',
           scrollTrigger: { trigger: '.facts', start: 'top 88%' }
         });
 
-        /* Cartões de serviços com stagger + imagens reveladas por clip-path */
+        /* Cartões de serviços com stagger; imagens com zoom suave (só escala) */
         gsap.from('.services .svc', {
-          y: 48, opacity: 0, duration: 1, ease: EASE, stagger: 0.12, clearProps: 'transform,opacity',
+          y: 48, duration: 1, ease: EASE, stagger: 0.12, clearProps: 'transform',
           scrollTrigger: { trigger: '.services', start: 'top 85%' }
         });
-        gsap.utils.toArray('.svc .ph').forEach(function (ph) {
-          var img = ph.querySelector('img');
-          gsap.fromTo(ph,
-            { clipPath: 'inset(0 0 100% 0)' },
-            {
-              clipPath: 'inset(0 0 0% 0)', duration: 1.15, ease: EASE,
-              scrollTrigger: { trigger: ph, start: 'top 88%' }
-            });
-          if (img) {
-            gsap.from(img, {
-              scale: 1.18, duration: 1.4, ease: EASE, clearProps: 'scale',
-              scrollTrigger: { trigger: ph, start: 'top 88%' }
-            });
-          }
+        gsap.utils.toArray('.svc .ph img').forEach(function (img) {
+          gsap.from(img, {
+            scale: 1.18, duration: 1.4, ease: EASE, clearProps: 'scale',
+            scrollTrigger: { trigger: img, start: 'top 88%' }
+          });
         });
 
         gsap.from('.steps .step', {
-          y: 34, opacity: 0, duration: 0.95, ease: EASE, stagger: 0.12, clearProps: 'transform,opacity',
+          y: 34, duration: 0.95, ease: EASE, stagger: 0.12, clearProps: 'transform',
           scrollTrigger: { trigger: '.steps', start: 'top 85%' }
         });
         gsap.from('.bring', {
-          y: 36, opacity: 0, duration: 1, ease: EASE, clearProps: 'transform,opacity',
+          y: 36, duration: 1, ease: EASE, clearProps: 'transform',
           scrollTrigger: { trigger: '.bring', start: 'top 88%' }
         });
         gsap.from('.booking-form', {
-          y: 44, opacity: 0, duration: 1.05, ease: EASE, clearProps: 'transform,opacity',
+          y: 44, duration: 1.05, ease: EASE, clearProps: 'transform',
           scrollTrigger: { trigger: '.booking-form', start: 'top 86%' }
         });
         gsap.from('.faq details', {
-          y: 24, opacity: 0, duration: 0.85, ease: EASE, stagger: 0.08, clearProps: 'transform,opacity',
+          y: 24, duration: 0.85, ease: EASE, stagger: 0.08, clearProps: 'transform',
           scrollTrigger: { trigger: '.faq', start: 'top 86%' }
         });
         gsap.from('.contact-lines .contact-line', {
-          x: -26, opacity: 0, duration: 0.9, ease: EASE, stagger: 0.08, clearProps: 'transform,opacity',
+          x: -26, duration: 0.9, ease: EASE, stagger: 0.08, clearProps: 'transform',
           scrollTrigger: { trigger: '.contact-lines', start: 'top 86%' }
         });
-        gsap.fromTo('.map-box',
-          { clipPath: 'inset(0 0 100% 0)' },
-          {
-            clipPath: 'inset(0 0 0% 0)', duration: 1.15, ease: EASE,
-            scrollTrigger: { trigger: '.map-box', start: 'top 86%' }
-          });
+        gsap.from('.map-box', {
+          y: 36, duration: 1.15, ease: EASE, clearProps: 'transform',
+          scrollTrigger: { trigger: '.map-box', start: 'top 86%' }
+        });
         gsap.from('.foot-grid > div', {
-          y: 26, opacity: 0, duration: 0.9, ease: EASE, stagger: 0.1, clearProps: 'transform,opacity',
+          y: 26, duration: 0.9, ease: EASE, stagger: 0.1, clearProps: 'transform',
           scrollTrigger: { trigger: 'footer.site', start: 'top 90%' }
         });
 
