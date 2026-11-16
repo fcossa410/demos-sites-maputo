@@ -146,7 +146,7 @@
 
   /* ---------- Calendário interactivo da reserva (criado por JS) ---------- */
   .hero-book{position:relative}
-  .cal-native-hidden{position:absolute!important;opacity:0;pointer-events:none;width:1px!important;height:1px;min-height:0!important;padding:0!important;border:none!important}
+  .cal-native-hidden{position:absolute!important;visibility:hidden;pointer-events:none;width:1px!important;height:1px;min-height:0!important;padding:0!important;border:none!important}
   .cal-trigger{width:100%;display:flex;align-items:center;justify-content:space-between;gap:10px;border:1.5px solid #ddd3b8;background:#fff;color:#132033;border-radius:12px;padding:11px 13px;min-height:48px;cursor:pointer;font-weight:600;text-align:left}
   .cal-trigger:hover{border-color:var(--gold)}
   .cal-trigger svg{width:20px;height:20px;color:var(--gold);flex:none}
@@ -229,15 +229,6 @@
   .room-tag{align-self:flex-start;background:var(--navy);color:#ffd968;font-size:.72rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;padding:6px 12px;border-radius:999px}
   .room-price{font-size:.95rem;color:var(--ink-2)}
   .room-price strong{color:var(--ink);font-size:1.05rem}
-  .tour-hud{display:none}
-  /* Modo fixo (pinned): activado por JS apenas em ecrãs largos e sem reduced-motion */
-  .tour.is-pinned{height:min(760px,calc(100svh - 110px));min-height:520px}
-  .tour.is-pinned .tour-panel{position:absolute;inset:0;padding:0;border-top:none;background:var(--cream);align-content:center}
-  .tour.is-pinned .tour-media img{height:min(62vh,520px)}
-  .tour.is-pinned .tour-hud{display:flex;position:absolute;left:2px;right:2px;bottom:4px;align-items:center;gap:18px;z-index:6}
-  .tour-count{font-family:"Playfair Display",serif;font-size:1.02rem;letter-spacing:.16em;color:var(--ink);white-space:nowrap}
-  .tour-barwrap{flex:1;height:2px;background:var(--line)}
-  .tour-bar{display:block;height:100%;background:var(--gold);transform:scaleX(0);transform-origin:left center}
   .illustrative{margin-top:26px;background:var(--gold-soft);border:1px solid rgba(168,127,20,.4);border-radius:14px;padding:16px 20px;font-size:.96rem;color:var(--ink)}
   .illustrative strong{color:var(--gold)}
 
@@ -349,7 +340,7 @@
 <div class="demo-bar" role="note" aria-label="Aviso de demonstração">
   <div class="wrap">
     <span class="demo-badge">Demonstração</span>
-    <span>Demonstração criada por <strong>Jack / Francisco Cossa</strong> · <a href="mailto:fcossa410@gmail.com">fcossa410@gmail.com</a> · <a href="tel:+258879713365">+258 879713365</a> · hospedagem incluída</span>
+    <span>Demonstração criada por <strong>Jack / Francisco Cossa</strong> · <a href="mailto:fcossa410@gmail.com">fcossa410@gmail.com</a></span>
   </div>
 </div>
 
@@ -504,10 +495,6 @@
         </div>
       </article>
 
-      <div class="tour-hud" aria-hidden="true">
-        <span class="tour-count">01 / 03</span>
-        <span class="tour-barwrap"><span class="tour-bar"></span></span>
-      </div>
     </div>
     <p class="illustrative"><strong>Fotos ilustrativas:</strong> as fotografias dos quartos nesta página são imagens genéricas de alojamento e <strong>não são fotografias dos quartos reais da Guesthouse 1109</strong>. Na reserva, confirmamos consigo o quarto exacto, a disponibilidade e o preço final.</p>
   </div>
@@ -781,7 +768,7 @@
         </ul>
       </div>
     </div>
-    <p class="foot-note"><strong style="color:#fff">Demonstração</strong> criada por <strong style="color:#fff">Jack / Francisco Cossa</strong> — <a href="mailto:fcossa410@gmail.com">fcossa410@gmail.com</a> · <a href="tel:+258879713365">+258 879713365</a> · hospedagem incluída. Preços, disponibilidade, comodidades e detalhes de cada quarto são confirmados na reserva. Fotos dos quartos: ilustrativas.</p>
+    <p class="foot-note"><strong style="color:#fff">Demonstração</strong> criada por <strong style="color:#fff">Jack / Francisco Cossa</strong> — <a href="mailto:fcossa410@gmail.com">fcossa410@gmail.com</a>. Preços, disponibilidade, comodidades e detalhes de cada quarto são confirmados na reserva. Fotos dos quartos: ilustrativas.</p>
   </div>
 </footer>
 
@@ -1180,7 +1167,7 @@
     var words = document.querySelectorAll(".hero-title .wword");
     if(words.length){
       gsap.set(words, {yPercent: 118});
-      gsap.to(words, {yPercent: 0, duration: 1.2, stagger: 0.08, ease: easePremium, delay: 0.1});
+      gsap.to(words, {yPercent: 0, duration: 1.2, stagger: 0.08, ease: easePremium, delay: 0.1, clearProps: "transform"});
     }
     gsap.from(".hero-addr, .hero .lead, .hero-book, .hero-note", {
       y: 34, opacity: 0, duration: 1.1, stagger: 0.1, ease: easePremium, delay: 0.6, clearProps: "all"
@@ -1209,6 +1196,21 @@
       });
     }
 
+    /* Rede de segurança: nada fica escondido por cima da dobra.
+       2,5 s depois do carregamento, qualquer elemento animado que já
+       esteja visível no ecrã volta ao seu estado natural do CSS, mesmo
+       que uma animação tenha falhado a meio. O conteúdo abaixo da dobra
+       mantém o seu reveal ao rolar. */
+    setTimeout(function(){
+      if(!window.gsap) return;
+      var els = document.querySelectorAll(".hero-title .wword, .hero-addr, .hero .lead, .hero-book, .hero-note, .sec-head, .step, .amenity-card, form.booking, .book-side, .contact-card, .about-photo, .gallery figure, .map-frame, .tour-panel, .tour-info, .tour-media img");
+      var vh = window.innerHeight;
+      els.forEach(function(el){
+        var r = el.getBoundingClientRect();
+        if(r.bottom > 0 && r.top < vh) gsap.set(el, {clearProps: "all"});
+      });
+    }, 2500);
+
     if(!window.ScrollTrigger) return;
 
     var mm = gsap.matchMedia();
@@ -1218,63 +1220,24 @@
         yPercent: 4, ease: "none",
         scrollTrigger: {trigger: ".hero", start: "top top", end: "bottom top", scrub: true}
       });
-
-      /* Tour dos quartos em scroll fixo (pinned), com reveal por clip-path */
-      var tour = document.getElementById("tour");
-      if(tour){
-        tour.classList.add("is-pinned");
-        var panels = gsap.utils.toArray(".tour-panel", tour);
-        var count = tour.querySelector(".tour-count");
-        var bar = tour.querySelector(".tour-bar");
-        var tl = gsap.timeline({
-          defaults: {ease: "none"},
-          scrollTrigger: {
-            trigger: tour, start: "top top+=92", end: "+=190%", scrub: 0.5,
-            pin: true, anticipatePin: 1,
-            onUpdate: function(self){
-              var idx = Math.min(panels.length, Math.floor(self.progress * panels.length) + 1);
-              if(count) count.textContent = "0" + idx + " / 0" + panels.length;
-              if(bar) bar.style.transform = "scaleX(" + self.progress + ")";
-            }
-          }
-        });
-        panels.forEach(function(panel, i){
-          if(i === 0) return;
-          var img = panel.querySelector(".tour-media img");
-          var info = panel.querySelector(".tour-info");
-          var prevInfo = panels[i - 1].querySelector(".tour-info");
-          gsap.set(panel, {clipPath: "inset(100% 0% 0% 0%)"});
-          if(img) gsap.set(img, {scale: 1.18});
-          if(info) gsap.set(info, {y: 54, opacity: 0});
-          var pos = 0.4 + (i - 1) * 1.4;
-          tl.to(panel, {clipPath: "inset(0% 0% 0% 0%)", duration: 1}, pos);
-          if(img) tl.to(img, {scale: 1, duration: 1}, pos);
-          if(info) tl.to(info, {y: 0, opacity: 1, duration: 0.7}, pos + 0.25);
-          if(prevInfo) tl.to(prevInfo, {opacity: 0.15, duration: 0.8}, pos);
-        });
-        tl.to({}, {duration: 0.35});
-      }
-      return function(){
-        if(tour) tour.classList.remove("is-pinned");
-      };
     });
 
-    /* Reveals por clip-path: foto do sobre, galeria e mapa */
+    /* Reveals: foto do sobre, galeria e mapa — subida suave, sem clip-path.
+       O CSS deixa tudo visível por defeito; o clearProps repõe o estado
+       natural quando a animação termina, por isso nada fica escondido. */
     gsap.utils.toArray(".about-photo, .gallery figure, .map-frame").forEach(function(el){
-      gsap.fromTo(el, {clipPath: "inset(0% 0% 100% 0%)"}, {
-        clipPath: "inset(0% 0% 0% 0%)", duration: 1.25, ease: easePremium, clearProps: "clipPath",
-        scrollTrigger: {trigger: el, start: "top 88%", once: true}
-      });
+      gsap.from(el, {y: 36, opacity: 0, duration: 1.05, ease: easePremium, clearProps: "all",
+        scrollTrigger: {trigger: el, start: "top 88%", once: true}});
     });
     /* Cabeçalhos de secção e cartões: subida suave */
     gsap.utils.toArray(".sec-head").forEach(function(el){
-      gsap.from(el, {y: 36, opacity: 0, duration: 1.05, ease: easePremium,
+      gsap.from(el, {y: 36, opacity: 0, duration: 1.05, ease: easePremium, clearProps: "all",
         scrollTrigger: {trigger: el, start: "top 88%", once: true}});
     });
-    gsap.from(".step", {y: 44, opacity: 0, duration: 1, stagger: 0.12, ease: easePremium,
+    gsap.from(".step", {y: 44, opacity: 0, duration: 1, stagger: 0.12, ease: easePremium, clearProps: "all",
       scrollTrigger: {trigger: ".steps", start: "top 86%", once: true}});
     gsap.utils.toArray(".amenity-card, form.booking, .book-side, .contact-card").forEach(function(el){
-      gsap.from(el, {y: 40, opacity: 0, duration: 1.05, ease: easePremium,
+      gsap.from(el, {y: 40, opacity: 0, duration: 1.05, ease: easePremium, clearProps: "all",
         scrollTrigger: {trigger: el, start: "top 88%", once: true}});
     });
 
