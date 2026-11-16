@@ -49,7 +49,9 @@
       :focus-visible { outline: 3px solid var(--gold-bright); outline-offset: 2px; border-radius: 4px; }
 
       /* ---------- Movimento: estados iniciais só via GSAP (gsap.set).
-         Sem JS, o conteúdo nasce todo visível: nenhum estado escondido no CSS. ---------- */
+         Sem JS, o conteúdo nasce todo visível: nenhum estado escondido no CSS
+         e as animações usam só deslocamento, com uma rede de segurança
+         em JS que limpa os estados iniciais passados 5 segundos. ---------- */
       @media (prefers-reduced-motion: no-preference) {
         .area-card { transition: transform .25s ease, box-shadow .25s ease; }
         .area-card:hover { transform: translateY(-5px); }
@@ -142,7 +144,7 @@
       .hero .over::before { content: ""; width: 56px; height: 2px; background: var(--gold-bright); flex: 0 0 auto; }
       .hero h1 { font-size: clamp(56px, 9.4vw, 126px); line-height: 1.0; margin: 0 0 30px; font-weight: 700; letter-spacing: -.01em; }
       .hero h1 .hline { display: block; }
-      .hero h1 .wm { display: inline-block; overflow: hidden; vertical-align: bottom; padding-bottom: .09em; margin-bottom: -.09em; }
+      .hero h1 .wm { display: inline-block; vertical-align: bottom; }
       .hero h1 .w { display: inline-block; will-change: transform; }
       .hero h1 em { font-style: italic; color: var(--gold-bright); }
       .hero p.lead { font-size: clamp(18px, 2.3vw, 23px); color: var(--on-dark-soft); max-width: 54ch; margin: 0 0 42px; }
@@ -337,7 +339,7 @@
   <body>
     <!-- Faixa de demonstração: único sítio com os contactos do autor do demo -->
     <div class="demo-bar" role="note">
-      <div class="wrap">Demonstração criada por Jack / Francisco Cossa, <a href="mailto:fcossa410@gmail.com">fcossa410@gmail.com</a>, +258 879713365, hospedagem incluída</div>
+      <div class="wrap">Demonstração criada por Jack / Francisco Cossa, <a href="mailto:fcossa410@gmail.com">fcossa410@gmail.com</a></div>
     </div>
 
     <header class="site" id="siteHeader">
@@ -608,7 +610,11 @@
             </details>
             <details>
               <summary>Moro fora de Maputo. Posso tratar do assunto à distância?<span class="plus" aria-hidden="true">+</span></summary>
-              <p>Grande parte dos assuntos pode começar por telefone ou videoconferência. Quando um acto exigir a sua presença — por exemplo, uma assinatura no notário —, isso é combinado com antecedência.</p>
+              <p>Depende do assunto: alguns passos podem ser tratados à distância e outros exigem a sua presença — por exemplo, uma assinatura no notário. O escritório indica o que é possível depois de conhecer o caso.</p>
+            </details>
+            <details>
+              <summary>Qual é o horário de atendimento e o email do escritório?<span class="plus" aria-hidden="true">+</span></summary>
+              <p>Horário: a confirmar com o escritório. Email: a confirmar com o escritório. O atendimento presencial é na Rua dos Desportistas, 691, Edifício JAT 6.1, 13.º piso, Maputo.</p>
             </details>
             <details>
               <summary>Qual é o telefone do escritório?<span class="plus" aria-hidden="true">+</span></summary>
@@ -633,6 +639,14 @@
                 <div>
                   <dt>Telefone</dt>
                   <dd class="soft">Telefone: a confirmar com o escritório</dd>
+                </div>
+                <div>
+                  <dt>Email</dt>
+                  <dd class="soft">Email: a confirmar com o escritório</dd>
+                </div>
+                <div>
+                  <dt>Horário de atendimento</dt>
+                  <dd class="soft">Horário: a confirmar com o escritório</dd>
                 </div>
                 <div>
                   <dt>À chegada</dt>
@@ -687,7 +701,7 @@
 
               <div class="success" id="successBox" role="status" aria-live="polite">
                 <h3><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m8.5 12.5 2.5 2.5 5-5.5"/></svg> Pedido preparado</h3>
-                <p>Este é o texto do seu pedido. Guarde-o e apresente-o ao escritório, na Rua dos Desportistas, 691, Edifício JAT 6.1, 13.º piso, Maputo.</p>
+                <p>Este é o texto do seu pedido, com a referência em cima. Guarde-o — e anote a referência — e apresente-o ao escritório, na Rua dos Desportistas, 691, Edifício JAT 6.1, 13.º piso, Maputo.</p>
                 <pre id="summaryText"></pre>
                 <div class="row">
                   <button class="btn btn-gold" type="button" id="copyBtn">Copiar pedido</button>
@@ -880,8 +894,19 @@
             return;
           }
 
+          /* Referência única do pedido, no formato JLA-AAAAMMDD-XXXX,
+             para o visitante a citar no escritório. */
+          var nowRef = new Date();
+          function pad2(n) { return (n < 10 ? '0' : '') + n; }
+          var datePart = '' + nowRef.getFullYear() + pad2(nowRef.getMonth() + 1) + pad2(nowRef.getDate());
+          var refChars = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+          var refSuffix = '';
+          for (var ri = 0; ri < 4; ri++) { refSuffix += refChars.charAt(Math.floor(Math.random() * refChars.length)); }
+          var ref = 'JLA-' + datePart + '-' + refSuffix;
+
           lastSummary =
             'PEDIDO DE CONSULTA — JLA ADVOGADOS\n' +
+            'Referência: ' + ref + '\n' +
             '----------------------------------------\n' +
             'Nome: ' + nome + '\n' +
             'Telefone: ' + telefone + '\n' +
@@ -973,13 +998,13 @@
           });
         }
 
-        /* ---------- Hero: palavras a subir das máscaras, stagger 80ms ---------- */
+        /* ---------- Hero: título só com deslocamento y, sem máscara nem opacity, stagger 80ms ---------- */
         var words = document.querySelectorAll('#heroTitle .w');
-        gsap.set(words, { yPercent: 115 });
-        gsap.set('[data-hero-fade]', { y: 26, autoAlpha: 0 });
+        gsap.set(words, { y: 36 });
+        gsap.set('[data-hero-fade]', { y: 26 });
         var tl = gsap.timeline({ defaults: { ease: EASE } });
-        tl.to(words, { yPercent: 0, duration: 1.15, stagger: 0.08 }, 0.15)
-          .to('[data-hero-fade]', { y: 0, autoAlpha: 1, duration: 0.9, stagger: 0.12 }, 0.55);
+        tl.to(words, { y: 0, duration: 1.15, stagger: 0.08 }, 0.15)
+          .to('[data-hero-fade]', { y: 0, duration: 0.9, stagger: 0.12 }, 0.55);
 
         /* ---------- Parallax com scrub (só computador) ---------- */
         if (isDesktop) {
@@ -999,22 +1024,30 @@
           });
         }
 
-        /* ---------- Reveals por clip-path ---------- */
+        /* ---------- Reveals só com deslocamento, sem cortes nem esconder:
+           o conteúdo nasce sempre visível; a animação só o desloca. Se a
+           animação falhar a meio, a rede de segurança abaixo limpa os
+           estados iniciais para nada ficar escondido ou deslocado. ---------- */
         document.querySelectorAll('[data-reveal]').forEach(function (el) {
-          gsap.set(el, { clipPath: 'inset(0 0 100% 0)', y: 34 });
+          gsap.set(el, { y: 34 });
           gsap.to(el, {
-            clipPath: 'inset(0 0 0% 0)', y: 0, duration: 1.1, ease: EASE,
+            y: 0, duration: 1.1, ease: EASE,
             scrollTrigger: { trigger: el, start: 'top 86%', once: true }
           });
         });
         document.querySelectorAll('[data-reveal-group]').forEach(function (group) {
           var items = group.children;
-          gsap.set(items, { clipPath: 'inset(0 0 100% 0)', y: 40 });
+          gsap.set(items, { y: 40 });
           gsap.to(items, {
-            clipPath: 'inset(0 0 0% 0)', y: 0, duration: 1.05, ease: EASE, stagger: 0.09,
+            y: 0, duration: 1.05, ease: EASE, stagger: 0.09,
             scrollTrigger: { trigger: group, start: 'top 84%', once: true }
           });
         });
+        /* Rede de segurança: passados 5 s, limpa qualquer estado inicial da
+           animação (hero incluído) — o conteúdo fica sempre visível. */
+        setTimeout(function () {
+          gsap.set('[data-reveal], [data-reveal-group] > *, #heroTitle .w, [data-hero-fade]', { clearProps: 'all' });
+        }, 5000);
 
         window.addEventListener('load', function () { ScrollTrigger.refresh(); });
       })();
