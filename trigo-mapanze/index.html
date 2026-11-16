@@ -98,7 +98,7 @@ nav.main a:hover{color:var(--navy)}
 .sec-head h2{font-size:clamp(2.4rem,4.2vw,3.6rem);color:var(--navy);margin:16px 0 18px}
 .sec-head.center{margin-left:auto;margin-right:auto;text-align:center}
 .sec-head.center .lede{margin:0 auto}
-.clip-target{will-change:clip-path}
+/* Secções: revelação só por deslocamento (conteúdo sempre visível) */
 
 /* Areas */
 .areas-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:28px}
@@ -275,6 +275,13 @@ footer.site{background:#fff;border-top:1px solid var(--line);padding:44px 0 34px
 }
 @media (max-width: 620px){
   .wrap{padding:0 20px}
+  .header-in{gap:12px;height:62px}
+  nav.main{top:62px}
+  .brand{ gap:10px}
+  .brand-mark{width:48px;height:38px;font-size:11px}
+  .brand-name{font-size:16px}
+  .brand-sub{font-size:10.5px}
+  .menu-btn{padding:8px 10px}
   .trust-grid,.areas-grid,.cases-grid,.steps4{grid-template-columns:1fr}
   .case-card.wide{grid-column:span 1}
   .hero-copy{padding:44px 20px 40px}
@@ -291,7 +298,7 @@ footer.site{background:#fff;border-top:1px solid var(--line);padding:44px 0 34px
 </head>
 <body>
 
-<div class="demo-bar"><span class="tag">Demonstração</span> Demonstração criada por <strong>Jack / Francisco Cossa</strong>, <a href="mailto:fcossa410@gmail.com">fcossa410@gmail.com</a>, +258 879713365, hospedagem incluída</div>
+<div class="demo-bar"><span class="tag">Demonstração</span> Demonstração criada por <strong>Jack / Francisco Cossa</strong>, <a href="mailto:fcossa410@gmail.com">fcossa410@gmail.com</a></div>
 
 <header class="site">
   <div class="wrap header-in">
@@ -430,7 +437,7 @@ footer.site{background:#fff;border-top:1px solid var(--line);padding:44px 0 34px
     <div class="wrap office-grid">
       <div class="clip-target">
         <p class="eyebrow">O escritório</p>
-        <h2>Estamos na 24 de Julho, no Prédio Progresso — e tratamos de casos reais, todos os dias</h2>
+        <h2>Estamos na 24 de Julho, no Prédio Progresso — no centro de Maputo</h2>
         <p>O escritório <strong>Trigo de Morais &amp; Mapanze Advogados</strong> fica no 5.º andar do Prédio Progresso, na Avenida 24 de Julho, bem no centro de Maputo. É aqui que recebemos quem nos procura: o comerciante que quer formalizar o negócio, o trabalhador que não recebeu o que lhe é devido, a família que precisa de pôr uma herança em ordem.</p>
         <p>Antes de assinar o que quer que seja, o cliente senta-se connosco e percebe três coisas: <strong>o que a lei diz sobre o caso, quanto tempo o processo pode levar e quanto vai custar.</strong> Se o caso não tiver fundamento, também o dizemos — logo na primeira conversa.</p>
         <p>Tratamos de papelada em conservatórias e cartórios, negociamos quando ainda há espaço para acordo e, quando não há, <strong>representamos o cliente em tribunal.</strong> O cliente é informado em cada fase, sem precisar de andar atrás de respostas.</p>
@@ -443,6 +450,8 @@ footer.site{background:#fff;border-top:1px solid var(--line);padding:44px 0 34px
         <div class="fact"><b>Como começa</b><span>Com uma consulta marcada, presencial no escritório</span></div>
         <div class="fact"><b>Sigilo</b><span>O que nos contar fica entre nós — é dever do advogado</span></div>
         <div class="fact"><b>Telefone</b><span>Telefone: a confirmar com o escritório</span></div>
+        <div class="fact"><b>Email</b><span>Email: a confirmar com o escritório</span></div>
+        <div class="fact"><b>Horário</b><span>Horário de atendimento: a confirmar com o escritório</span></div>
       </aside>
     </div>
   </section>
@@ -452,7 +461,7 @@ footer.site{background:#fff;border-top:1px solid var(--line);padding:44px 0 34px
     <div class="wrap">
       <div class="sec-head clip-target">
         <p class="eyebrow">Situações frequentes</p>
-        <h2>Casos que chegam ao escritório todas as semanas</h2>
+        <h2>Situações frequentes</h2>
         <p class="lede">Reconhece a sua situação? Toque em “É o meu caso” e o formulário já abre com o assunto escolhido — só tem de contar os detalhes.</p>
       </div>
       <div class="cases-grid" id="casesGrid"></div>
@@ -514,8 +523,8 @@ footer.site{background:#fff;border-top:1px solid var(--line);padding:44px 0 34px
           </div>
           <div class="field"><label for="f-msg">Mensagem — o que aconteceu? *</label><textarea id="f-msg" placeholder="Conte o caso com as suas palavras: o que aconteceu, quando, e quem está envolvido."></textarea></div>
           <p class="form-err" id="formErr" role="alert"></p>
-          <button class="btn" type="submit" style="width:100%">Copiar pedido</button>
-          <p class="form-note">Ao tocar em «Copiar pedido», o seu pedido fica organizado num texto e é copiado — guarde-o e traga-o à consulta. Preencher este formulário não cria, por si só, uma relação de mandato com o escritório — essa começa quando for combinada e assinada.</p>
+          <button class="btn" type="submit" style="width:100%">Gerar e copiar pedido</button>
+          <p class="form-note">Este formulário não envia o pedido ao escritório: gera o texto do pedido para copiar e trazer à consulta. Preencher este formulário não cria, por si só, uma relação de mandato com o escritório — essa começa quando for combinada e assinada.</p>
           <div class="result" id="formResult" role="status" aria-live="polite">
             <h3>Pedido pronto ✓</h3>
             <p style="font-size:14.5px;color:var(--ink-soft);margin-bottom:14px">Este é o seu pedido. Se a cópia automática falhar, toque outra vez no botão abaixo. Quando vier ao escritório, traga os documentos do caso.</p>
@@ -547,6 +556,8 @@ footer.site{background:#fff;border-top:1px solid var(--line);padding:44px 0 34px
           <li><b>Referência —</b><span>Prédio Progresso, na Avenida 24 de Julho, centro da cidade de Maputo.</span></li>
           <li><b>À chegada —</b><span>Suba ao 5.º andar e indique na receção que tem consulta marcada.</span></li>
           <li><b>Traga —</b><span>O Bilhete de Identidade e os documentos do caso (ver lista junto ao formulário).</span></li>
+          <li><b>Email —</b><span>Email do escritório: a confirmar com o escritório.</span></li>
+          <li><b>Horário —</b><span>Horário de atendimento: a confirmar com o escritório.</span></li>
           <li><b>Marcação de consultas —</b><span>Para não ficar à espera, as consultas são combinadas antes. Faça o pedido no formulário desta página: indique o assunto, um número de telemóvel válido e uma descrição breve do caso.</span></li>
           <li><b>Caso urgente? —</b><span>Se recebeu uma notificação do tribunal ou tem um prazo a correr, diga-o logo na descrição do pedido — os prazos são a primeira coisa que verificamos.</span></li>
         </ul>
@@ -583,7 +594,7 @@ footer.site{background:#fff;border-top:1px solid var(--line);padding:44px 0 34px
       </div>
       <div>
         <h4>Sobre esta demonstração</h4>
-        <p>Site de demonstração criado por Jack / Francisco Cossa, com hospedagem incluída na proposta.<br><a href="mailto:fcossa410@gmail.com">fcossa410@gmail.com</a></p>
+        <p>Site de demonstração criado por Jack / Francisco Cossa.<br><a href="mailto:fcossa410@gmail.com">fcossa410@gmail.com</a></p>
       </div>
     </div>
     <div class="foot-base">
@@ -864,7 +875,7 @@ footer.site{background:#fff;border-top:1px solid var(--line);padding:44px 0 34px
     var words = document.querySelectorAll('#heroTitle .w');
     if(words.length){
       gsap.set(words, {yPercent: 115});
-      gsap.to(words, {yPercent: 0, duration: 1.15, ease: 'power4.out', stagger: 0.08, delay: 0.12});
+      gsap.to(words, {yPercent: 0, duration: 1.15, ease: 'power4.out', stagger: 0.08, delay: 0.12, clearProps: 'transform'});
       // also honour exact bezier via CSS-like ease name fallback: power4 is closest; set custom if available
     }
     gsap.set('.hero-copy .lede, .hero-actions, .hero-meta', {y: 26});
@@ -881,13 +892,11 @@ footer.site{background:#fff;border-top:1px solid var(--line);padding:44px 0 34px
         gsap.set(track, {xPercent: 0});
         gsap.to(track, {xPercent: -50, duration: 36, ease:'none', repeat:-1});
       }
-      // Clip-path reveals
+      // Revelação só por deslocamento: o conteúdo nasce sempre visível
+      // (nada escondido antes de entrar na vista); ao entrar, desliza 24px para o lugar.
       document.querySelectorAll('.clip-target').forEach(function(el){
-        gsap.set(el, {clipPath:'inset(0 0 100% 0)', y: 24});
-        ScrollTrigger.create({
-          trigger: el, start: 'top 88%', once: true,
-          onEnter: function(){ gsap.to(el, {clipPath:'inset(0 0 0% 0)', y:0, duration:1.05, ease:'power3.out', clearProps:'clipPath,transform'}); }
-        });
+        gsap.fromTo(el, {y: 24}, {y: 0, duration: 1.05, ease: 'power3.out', clearProps: 'transform',
+          scrollTrigger: {trigger: el, start: 'top 88%', once: true}, immediateRender: false});
       });
       // Giant process numbers subtle rise
       document.querySelectorAll('.step4 .gn').forEach(function(el, i){
